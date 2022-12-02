@@ -9,7 +9,6 @@ fn main() {
     let file_path = &args[1];
     
     if let Ok(lines) = read_lines(file_path) {
-        // Consumes the iterator, returns an (Optional) String
         let mut ip; // keeps line
         let mut acc = 0; // keeps accumulator for sum
         let mut vec = Vec::new();
