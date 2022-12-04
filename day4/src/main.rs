@@ -1,7 +1,7 @@
 use std::env;
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::ops::Range;
+use std::cmp::{min, max};
 use std::path::Path;
 
 fn main() {
@@ -18,7 +18,7 @@ fn main() {
             let (a1, a2) = parse_range(fst);
             let (b1, b2) = parse_range(snd);
 
-            if (a1 >= b1 && a2 <= b2) || (a1 <= b1 && a2 >= b2) {
+            if max(a1, b1) <= min(a2, b2) {
                 acc += 1;
             }
         }
