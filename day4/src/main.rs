@@ -22,6 +22,7 @@ fn main() {
                 acc += 1;
             }
         }
+        
         println!("score: {:?}", acc);
     }
 }
