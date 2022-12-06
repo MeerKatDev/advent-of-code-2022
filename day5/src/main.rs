@@ -7,6 +7,7 @@ use std::path::Path;
 fn main() {
     let args: Vec<String> = env::args().collect();
     let file_path = &args[1];
+    // to be set together with the input (ofc it could be taken programmatically too)
     const CRANES_NUM: usize = 9;
 
     if let Ok(lines) = read_lines(file_path) {
@@ -14,7 +15,7 @@ fn main() {
         let mut cranes = [INIT_VEC; CRANES_NUM];
         let mut parsing_crane: bool = true;
         let mut move_cx: [usize; CRANES_NUM] = [1; CRANES_NUM]; // moving coordinates
-        let mut tmp;
+                                                                // let mut tmp;
 
         // regex capturing [A] .. [Z] crates or spaces between
         let re_crane = Regex::new(r"([A-Z]|\s\s\s\s)\w*").unwrap();
@@ -42,10 +43,15 @@ fn main() {
                     move_cx[idx] = number[0].parse::<usize>().unwrap();
                 }
 
-                for _ in 0..(move_cx[0]) {
-                    tmp = cranes[move_cx[1] - 1].pop().unwrap();
-                    cranes[move_cx[2] - 1].push(tmp);
-                }
+                // range of crates to drain
+                let range_to_rem = (cranes[move_cx[1] - 1].len() - move_cx[0])..;
+
+                // crates in movement
+                let mut cranes_to_append: Vec<_> =
+                    cranes[move_cx[1] - 1].drain(range_to_rem).collect();
+
+                // crates being stacked in the same order
+                cranes[move_cx[2] - 1].append(&mut cranes_to_append);
             }
         }
         // collecting last crates
