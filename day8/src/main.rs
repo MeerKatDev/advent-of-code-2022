@@ -6,21 +6,15 @@ use std::path::Path;
 fn main() {
     let args: Vec<String> = env::args().collect();
     let file_path = &args[1];
-    let mut acc = 0;
-    let mut digits;
-    let mut tree_heights: Vec<Vec<usize>> = Vec::new();
 
     if let Ok(lines) = read_lines(file_path) {
-        let mut row;
         let mut max = 0;
         let mut tmp: usize;
+        let mut acc = 0;
 
         // parse heights map
-        for line in lines {
-            row = line.unwrap();
-            digits = line_to_int_vec(row);
-            tree_heights.push(digits);
-        }
+        let tree_heights: Vec<Vec<usize>> =
+            lines.map(|line| line_to_int_vec(line.unwrap())).collect();
 
         // comparing trees
         for (r, tree_line) in tree_heights.iter().enumerate() {
@@ -50,55 +44,31 @@ fn main() {
 // part one
 
 fn visible_from_up(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> bool {
-    let mut visible = true;
-
-    for other_tree in tree_heights.iter().take(r) {
-        if tree <= other_tree[c] {
-            visible = false;
-            break;
-        }
-    }
-
-    visible
+    !tree_heights
+        .iter()
+        .take(r)
+        .any(|other_tree| tree <= other_tree[c])
 }
 
 fn visible_from_left(tree_line: &[usize], tree: usize, c: usize) -> bool {
-    let mut visible = true;
-
-    for &other_tree in tree_line.iter().take(c) {
-        if tree <= other_tree {
-            visible = false;
-            break;
-        }
-    }
-
-    visible
+    !tree_line
+        .iter()
+        .take(c)
+        .any(|&other_tree| tree <= other_tree)
 }
 
 fn visible_from_down(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> bool {
-    let mut visible = true;
-
-    for other_tree in tree_heights.iter().skip(r + 1) {
-        if tree <= other_tree[c] {
-            visible = false;
-            break;
-        }
-    }
-
-    visible
+    !tree_heights
+        .iter()
+        .skip(r + 1)
+        .any(|other_tree| tree <= other_tree[c])
 }
 
 fn visible_from_right(tree_line: &[usize], tree: usize, c: usize) -> bool {
-    let mut visible = true;
-
-    for &other_tree in tree_line.iter().skip(c + 1) {
-        if tree <= other_tree {
-            visible = false;
-            break;
-        }
-    }
-
-    visible
+    !tree_line
+        .iter()
+        .skip(c + 1)
+        .any(|&other_tree| tree <= other_tree)
 }
 
 // part two
