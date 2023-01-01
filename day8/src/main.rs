@@ -25,10 +25,11 @@ fn main() {
         // comparing trees
         for (r, tree_line) in tree_heights.iter().enumerate() {
             for (c, &tree) in tree_line.iter().enumerate() {
-                if visible_from_up(&tree_heights, tree, r, c) ||
-                    visible_from_left(&tree_line, tree, c) ||
-                    visible_from_down(&tree_heights, tree, r, c) ||
-                    visible_from_right(&tree_line, tree, c) {
+                if visible_from_up(&tree_heights, tree, r, c)
+                    || visible_from_down(&tree_heights, tree, r, c)
+                    || visible_from_left(tree_line, tree, c)
+                    || visible_from_right(tree_line, tree, c)
+                {
                     acc += 1;
                 }
 
@@ -51,12 +52,8 @@ fn main() {
 fn visible_from_up(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> bool {
     let mut visible = true;
 
-    if r == 0 {
-        return true;
-    }
-
-    for i in 0..r {
-        if tree <= tree_heights[i][c] {
+    for other_tree in tree_heights.iter().take(r) {
+        if tree <= other_tree[c] {
             visible = false;
             break;
         }
@@ -68,12 +65,8 @@ fn visible_from_up(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize)
 fn visible_from_left(tree_line: &[usize], tree: usize, c: usize) -> bool {
     let mut visible = true;
 
-    if c == 0 {
-        return true;
-    }
-
-    for i in 0..c {
-        if tree <= tree_line[i] {
+    for &other_tree in tree_line.iter().take(c) {
+        if tree <= other_tree {
             visible = false;
             break;
         }
@@ -84,14 +77,9 @@ fn visible_from_left(tree_line: &[usize], tree: usize, c: usize) -> bool {
 
 fn visible_from_down(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> bool {
     let mut visible = true;
-    let h = tree_heights.len();
 
-    if r == (h - 1) {
-        return true;
-    }
-
-    for i in (r + 1)..h {
-        if tree <= tree_heights[i][c] {
+    for other_tree in tree_heights.iter().skip(r + 1) {
+        if tree <= other_tree[c] {
             visible = false;
             break;
         }
@@ -102,14 +90,9 @@ fn visible_from_down(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usiz
 
 fn visible_from_right(tree_line: &[usize], tree: usize, c: usize) -> bool {
     let mut visible = true;
-    let w = tree_line.len();
 
-    if c == (w - 1) {
-        return true;
-    }
-
-    for i in (c + 1)..w {
-        if tree <= tree_line[i] {
+    for &other_tree in tree_line.iter().skip(c + 1) {
+        if tree <= other_tree {
             visible = false;
             break;
         }
@@ -122,10 +105,6 @@ fn visible_from_right(tree_line: &[usize], tree: usize, c: usize) -> bool {
 
 fn scenic_score_from_up(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> usize {
     let mut score = 0;
-
-    if r == 0 {
-        return 0;
-    }
 
     for i in (0..r).rev() {
         score += 1;
@@ -141,10 +120,6 @@ fn scenic_score_from_up(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: u
 fn scenic_score_from_left(tree_line: &[usize], tree: usize, c: usize) -> usize {
     let mut score = 0;
 
-    if c == 0 {
-        return 0;
-    }
-
     for i in (0..c).rev() {
         score += 1;
 
@@ -158,16 +133,11 @@ fn scenic_score_from_left(tree_line: &[usize], tree: usize, c: usize) -> usize {
 
 fn scenic_score_from_down(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> usize {
     let mut score = 0;
-    let h = tree_heights.len();
 
-    if r == (h - 1) {
-        return 0;
-    }
-
-    for i in (r + 1)..h {
+    for other_tree in tree_heights.iter().skip(r + 1) {
         score += 1;
 
-        if tree <= tree_heights[i][c] {
+        if tree <= other_tree[c] {
             break;
         }
     }
@@ -177,16 +147,11 @@ fn scenic_score_from_down(tree_heights: &[Vec<usize>], tree: usize, r: usize, c:
 
 fn scenic_score_from_right(tree_line: &[usize], tree: usize, c: usize) -> usize {
     let mut score = 0;
-    let w = tree_line.len();
 
-    if c == (w - 1) {
-        return 0;
-    }
-
-    for i in (c + 1)..w {
+    for &other_tree in tree_line.iter().skip(c + 1) {
         score += 1;
 
-        if tree <= tree_line[i] {
+        if tree <= other_tree {
             break;
         }
     }
