@@ -12,6 +12,8 @@ fn main() {
 
     if let Ok(lines) = read_lines(file_path) {
         let mut row;
+        let mut max = 0;
+        let mut tmp: usize;
 
         // parse heights map
         for line in lines {
@@ -20,22 +22,33 @@ fn main() {
             tree_heights.push(digits);
         }
 
+        // comparing trees
         for (r, tree_line) in tree_heights.iter().enumerate() {
             for (c, &tree) in tree_line.iter().enumerate() {
-                if visible_from_up(&tree_heights, tree, r, c) || 
-                    visible_from_left(&tree_line, tree, c) || 
-                    visible_from_down(&tree_heights, tree, r, c) || 
+                if visible_from_up(&tree_heights, tree, r, c) ||
+                    visible_from_left(&tree_line, tree, c) ||
+                    visible_from_down(&tree_heights, tree, r, c) ||
                     visible_from_right(&tree_line, tree, c) {
                     acc += 1;
                 }
+
+                tmp = scenic_score_from_up(&tree_heights, tree, r, c)
+                    * scenic_score_from_down(&tree_heights, tree, r, c)
+                    * scenic_score_from_left(tree_line, tree, c)
+                    * scenic_score_from_right(tree_line, tree, c);
+
+                max = tmp.max(max);
             }
         }
 
-        println!("Result={}", acc);
+        println!("Result to Part One: {acc}");
+        println!("Result to Part Two: {max}");
     }
 }
 
-fn visible_from_up(tree_heights: &Vec<Vec<usize>>, tree: usize, r: usize, c: usize) -> bool {
+// part one
+
+fn visible_from_up(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> bool {
     let mut visible = true;
 
     if r == 0 {
@@ -51,7 +64,6 @@ fn visible_from_up(tree_heights: &Vec<Vec<usize>>, tree: usize, r: usize, c: usi
 
     visible
 }
-
 
 fn visible_from_left(tree_line: &[usize], tree: usize, c: usize) -> bool {
     let mut visible = true;
@@ -70,7 +82,7 @@ fn visible_from_left(tree_line: &[usize], tree: usize, c: usize) -> bool {
     visible
 }
 
-fn visible_from_down(tree_heights: &Vec<Vec<usize>>, tree: usize, r: usize, c: usize) -> bool {
+fn visible_from_down(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> bool {
     let mut visible = true;
     let h = tree_heights.len();
 
@@ -78,7 +90,7 @@ fn visible_from_down(tree_heights: &Vec<Vec<usize>>, tree: usize, r: usize, c: u
         return true;
     }
 
-    for i in (r+1)..h {
+    for i in (r + 1)..h {
         if tree <= tree_heights[i][c] {
             visible = false;
             break;
@@ -96,7 +108,7 @@ fn visible_from_right(tree_line: &[usize], tree: usize, c: usize) -> bool {
         return true;
     }
 
-    for i in (c+1)..w {
+    for i in (c + 1)..w {
         if tree <= tree_line[i] {
             visible = false;
             break;
@@ -106,8 +118,87 @@ fn visible_from_right(tree_line: &[usize], tree: usize, c: usize) -> bool {
     visible
 }
 
+// part two
+
+fn scenic_score_from_up(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> usize {
+    let mut score = 0;
+
+    if r == 0 {
+        return 0;
+    }
+
+    for i in (0..r).rev() {
+        score += 1;
+
+        if tree <= tree_heights[i][c] {
+            break;
+        }
+    }
+
+    score
+}
+
+fn scenic_score_from_left(tree_line: &[usize], tree: usize, c: usize) -> usize {
+    let mut score = 0;
+
+    if c == 0 {
+        return 0;
+    }
+
+    for i in (0..c).rev() {
+        score += 1;
+
+        if tree <= tree_line[i] {
+            break;
+        }
+    }
+
+    score
+}
+
+fn scenic_score_from_down(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> usize {
+    let mut score = 0;
+    let h = tree_heights.len();
+
+    if r == (h - 1) {
+        return 0;
+    }
+
+    for i in (r + 1)..h {
+        score += 1;
+
+        if tree <= tree_heights[i][c] {
+            break;
+        }
+    }
+
+    score
+}
+
+fn scenic_score_from_right(tree_line: &[usize], tree: usize, c: usize) -> usize {
+    let mut score = 0;
+    let w = tree_line.len();
+
+    if c == (w - 1) {
+        return 0;
+    }
+
+    for i in (c + 1)..w {
+        score += 1;
+
+        if tree <= tree_line[i] {
+            break;
+        }
+    }
+
+    score
+}
+
 fn line_to_int_vec(row: String) -> Vec<usize> {
-  return row.chars().map(|c| c.to_digit(10).unwrap() as usize).collect();
+    return row
+        .chars()
+        .map(|c| c.to_digit(10).unwrap() as usize)
+        .collect();
 }
 
 fn read_lines<P>(filename: P) -> io::Result<Lines<BufReader<File>>>
