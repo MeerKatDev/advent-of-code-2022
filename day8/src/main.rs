@@ -8,40 +8,54 @@ fn main() {
     let file_path = &args[1];
 
     if let Ok(lines) = read_lines(file_path) {
-        let mut max = 0;
-        let mut tmp: usize;
-        let mut acc = 0;
-
-        // parse heights map
         let tree_heights: Vec<Vec<usize>> =
             lines.map(|line| line_to_int_vec(line.unwrap())).collect();
 
-        // comparing trees
-        for (r, tree_line) in tree_heights.iter().enumerate() {
-            for (c, &tree) in tree_line.iter().enumerate() {
-                if visible_from_up(&tree_heights, tree, r, c)
-                    || visible_from_down(&tree_heights, tree, r, c)
-                    || visible_from_left(tree_line, tree, c)
-                    || visible_from_right(tree_line, tree, c)
-                {
-                    acc += 1;
-                }
-
-                tmp = scenic_score_from_up(&tree_heights, tree, r, c)
-                    * scenic_score_from_down(&tree_heights, tree, r, c)
-                    * scenic_score_from_left(tree_line, tree, c)
-                    * scenic_score_from_right(tree_line, tree, c);
-
-                max = tmp.max(max);
-            }
-        }
-
-        println!("Result to Part One: {acc}");
-        println!("Result to Part Two: {max}");
+        // much nicer but with a higher memory footprint
+        println!("Result to Part One: {}", part_one(&tree_heights));
+        println!("Result to Part Two: {}", part_two(&tree_heights));
     }
 }
 
-// part one
+fn part_one(tree_heights: &[Vec<usize>]) -> usize {
+    tree_heights
+        .iter()
+        .enumerate()
+        .map(|(r, tree_line)| {
+            tree_line
+                .iter()
+                .enumerate()
+                .filter(|(c, &tree)| {
+                    visible_from_up(tree_heights, tree, r, *c)
+                        || visible_from_down(tree_heights, tree, r, *c)
+                        || visible_from_left(tree_line, tree, *c)
+                        || visible_from_right(tree_line, tree, *c)
+                })
+                .count()
+        })
+        .sum()
+}
+
+fn part_two(tree_heights: &[Vec<usize>]) -> usize {
+    tree_heights
+        .iter()
+        .enumerate()
+        .map(|(r, tree_line)| {
+            tree_line
+                .iter()
+                .enumerate()
+                .map(|(c, &tree)| {
+                    scenic_score_from_up(tree_heights, tree, r, c)
+                        * scenic_score_from_down(tree_heights, tree, r, c)
+                        * scenic_score_from_left(tree_line, tree, c)
+                        * scenic_score_from_right(tree_line, tree, c)
+                })
+                .max()
+                .unwrap()
+        })
+        .max()
+        .unwrap()
+}
 
 fn visible_from_up(tree_heights: &[Vec<usize>], tree: usize, r: usize, c: usize) -> bool {
     !tree_heights
