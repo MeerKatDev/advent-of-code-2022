@@ -95,7 +95,7 @@ fn main() {
 
         // part two
         let bottom = upmost_point + 2;
-        for x in (leftmost_point-OFFSET)..=(rightmost_point+OFFSET) {
+        for x in (leftmost_point - OFFSET)..=(rightmost_point + OFFSET) {
             grid.insert((x, bottom));
         }
 
@@ -108,13 +108,14 @@ fn main() {
             // throwing sands
             sand_particle = (CENTER, 0);
 
-            loop { // travelling sand
+            loop {
+                // travelling sand
 
                 if grid.contains(&(CENTER, 0)) {
                     break 'outer;
                 }
 
-                if !grid.contains(&(sand_particle.0, sand_particle.1 + 1)) { 
+                if !grid.contains(&(sand_particle.0, sand_particle.1 + 1)) {
                     sand_particle = (sand_particle.0, sand_particle.1 + 1);
                 } else if !grid.contains(&(sand_particle.0 - 1, sand_particle.1 + 1)) {
                     sand_particle = (sand_particle.0 - 1, sand_particle.1 + 1);
@@ -130,7 +131,7 @@ fn main() {
         }
         println!("---- printing finally map ---");
         for yy in downmost_point..=bottom {
-            for xx in (leftmost_point-OFFSET)..=(rightmost_point+OFFSET) {
+            for xx in (leftmost_point - OFFSET)..=(rightmost_point + OFFSET) {
                 if grid.contains(&(xx, yy)) {
                     print!("#");
                 } else {
